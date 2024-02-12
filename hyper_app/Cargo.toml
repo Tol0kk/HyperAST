@@ -62,7 +62,7 @@ syn = { version = "2", features = ["full", "extra-traits"] }
 async_executors = "0.6"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 futures = "0.3"
-tokio-tungstenite-wasm = { version = "0.1.0" }
+tokio-tungstenite-wasm = { version = "0.2.1" }
 http = "0.2.6" # Types for HTTP requests and responses.
 
 # native:
