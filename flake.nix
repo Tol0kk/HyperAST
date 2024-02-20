@@ -43,7 +43,7 @@
             inherit src;
             strictDeps = true;
             doCheck = false; # Still do the check pahse for whatever reason !!!
-
+            stdenv = pkgs.llvmPackages_17.stdenv;
             # OpenSSL and Cmake dependancies
             OPENSSL_NO_VENDOR = 1;
             buildInputs = with pkgs; [
@@ -52,6 +52,9 @@
             nativeBuildInputs = with pkgs; [
               pkg-config
               cmake # Needed for prost-build crate
+            ] ++ lib.optional pkgs.stdenv.isDarwin [
+              pkgs.darwin.apple_sdk.frameworks.Security
+              pkgs.darwin.libiconv
             ];
           };
 
