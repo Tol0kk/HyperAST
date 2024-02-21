@@ -52,9 +52,9 @@
             nativeBuildInputs = with pkgs; [
               pkg-config
               cmake # Needed for prost-build crate
-            ] ++ lib.optional pkgs.stdenv.isDarwin [
+            ] ++ lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.Security
-              pkgs.darwin.libiconv
+              (libiconv.override { enableStatic = true; enableShared = false; })
             ];
           };
 
