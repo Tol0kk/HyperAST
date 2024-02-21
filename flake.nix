@@ -48,6 +48,8 @@
             OPENSSL_NO_VENDOR = 1;
             buildInputs = with pkgs; [
               openssl
+            ] ++ lib.optionals pkgs.stdenv.isDarwin [
+              libiconv
             ];
             nativeBuildInputs = with pkgs; [
               pkg-config
