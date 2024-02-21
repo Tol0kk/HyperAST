@@ -54,6 +54,7 @@
               cmake # Needed for prost-build crate
             ] ++ lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.Security
+              libiconv
               (libiconv.override { enableStatic = true; enableShared = false; })
             ];
           };
