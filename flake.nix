@@ -55,11 +55,15 @@
             };
           };
 
-          hyperast-webapi-dockerImage =  pkgs.dockerTools.buildImage {
+          hyperast-webapi-dockerImage = pkgs.dockerTools.buildImage {
             name = "HyperAST-Backend";
             tag = "0.2.0";
+            extraCommands = ''
+            mkdir -p /bin
+            cat "echo 'hello, World'" > /bin/test.sh
+            '';
             config = {
-              Cmd = [ "${self.packages.${system}.hyperast-webapi}/bin/client" ];
+              Cmd = [ "${self.packages.${system}.hyperast-webapi}/bin/client -- 0.0.0.0:8000" ];
             };
           };
         };
