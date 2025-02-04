@@ -54,6 +54,14 @@
               allowBuiltinFetchGit = true;
             };
           };
+
+          hyperast-webapi-dockerImage =  pkgs.dockerTools.buildImage {
+            name = "HyperAST-Backend";
+            tag = "0.2.0";
+            config = {
+              Cmd = [ "${self.packages.${system}.hyperast-webapi}/bin/client" ];
+            };
+          };
         };
 
         devShell = pkgs.mkShell rec {
