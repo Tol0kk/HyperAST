@@ -10,6 +10,7 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    nix-filter.url = "github:numtide/nix-filter";
   };
 
   outputs = { self, nixpkgs, flake-utils, rust-overlay, ... }@inputs:
@@ -19,20 +20,24 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-      in
-      {
-        apps = {
-          hyperast-webapi = {
-            type = "app";
-            program = "${self.packages.${system}.hyperast-webapi}/bin/client";
-          };
-        };
-
-        packages = {
-          hyperast-webapi = pkgs.rustPlatform.buildRustPackage rec {
+        filter = inputs.nix-filter.lib;
+        hyperast-backend = pkgs.rustPlatform.buildRustPackage {
             pname = "HyperAST-WebAPI";
             version = "0.1.0";
-            src = pkgs.lib.cleanSource ./.;
+            src = filter {
+              root = ./.;
+              exclude = [
+                ./.vscode
+                ./.github/workflows
+                ./.direnv
+                ./target
+                ./flake.lock
+                ./flake.nix
+                ./LICENCES
+                ./README.md
+              ];
+
+            };
             buildAndTestSubdir = "client";
             OPENSSL_NO_VENDOR = 1;
             release = true;
@@ -54,16 +59,37 @@
               allowBuiltinFetchGit = true;
             };
           };
+      in
+      {
+        apps = {
+          hyperast-webapi = {
+            type = "app";
+            program = "${hyperast-backend}/bin/client";
+          };
+        };
+
+        packages = rec {
+          hyperast-webapi = hyperast-backend;
+
+          _hyperast-webapi-dockerImage = pkgs.dockerTools.buildImage {
+            name = "HyperAST-Backend1111";
+            tag = "0.2.0";
+            config = {
+              Cmd = [ "${hyperast-backend}/bin/client -- 0.0.0.0:8000" ];
+            };
+          };
 
           hyperast-webapi-dockerImage = pkgs.dockerTools.buildImage {
-            name = "HyperAST-Backend";
+            name = "HyperAST-Backend2222";
             tag = "0.2.0";
-            extraCommands = ''
-            mkdir -p /bin
-            cat "echo 'hello, World'" > /bin/test.sh
+            fromImage = _hyperast-webapi-dockerImage;
+            runAsRoot = ''
+              mkdir -p /bin/
+              echo "echo aa" > /bin/test.sh
             '';
+            
             config = {
-              Cmd = [ "${self.packages.${system}.hyperast-webapi}/bin/client -- 0.0.0.0:8000" ];
+              Cmd = [ "${hyperast-backend}/bin/client -- 0.0.0.0:8000" ];
             };
           };
         };
